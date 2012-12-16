@@ -187,7 +187,7 @@ class MeetingController {
 
     private def recursiveNode(Meeting node) {
         [id: node.getId(),
-                name: node.getTitle(),
+         name: node.getTitle(),
                 children: node.getChildren().collect {recursiveNode(it)}
         ]
     }
