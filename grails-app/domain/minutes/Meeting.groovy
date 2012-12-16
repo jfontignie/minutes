@@ -1,5 +1,8 @@
 package minutes
 
+/**
+ * contains the meetings
+ */
 class Meeting {
 
     static searchable = true
