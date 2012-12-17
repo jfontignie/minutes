@@ -29,35 +29,78 @@
         };
 
         function initTree(json) {
+                        //Create a new ST instance
+
+        //Implement a node rendering function called 'nodeline' that plots a straight line
+            //when contracting or expanding a subtree.
+            $jit.ST.Plot.NodeTypes.implement({
+                'nodeline': {
+                  'render': function(node, canvas, animating) {
+                        if(animating === 'expand' || animating === 'contract') {
+                          var pos = node.pos.getc(true), nconfig = this.node, data = node.data;
+                          var width  = nconfig.width, height = nconfig.height;
+                          var algnPos = this.getAlignedPos(pos, width, height);
+                          var ctx = canvas.getCtx(), ort = this.config.orientation;
+                          ctx.beginPath();
+                          if(ort == 'left' || ort == 'right') {
+                              ctx.moveTo(algnPos.x, algnPos.y + height / 2);
+                              ctx.lineTo(algnPos.x + width, algnPos.y + height / 2);
+                          } else {
+                              ctx.moveTo(algnPos.x + width / 2, algnPos.y);
+                              ctx.lineTo(algnPos.x + width / 2, algnPos.y + height);
+                          }
+                          ctx.stroke();
+                      }
+                  }
+                }
+
+            });
+
             var st = new $jit.ST({
-                //id of viz container element
-                injectInto:'demo',
+                'injectInto': 'demo',
                 //set duration for the animation
                 duration: 800,
                 //set animation transition type
                 transition: $jit.Trans.Quart.easeInOut,
                 //set distance between node and its children
                 levelDistance: 50,
-                //enable panning
-                Navigation: {
-                  enable:true,
-                  panning:true
-                },
+                //set max levels to show. Useful when used with
+                //the request method for requesting trees of specific depth
+                levelsToShow: 2,
                 //set node and edge styles
                 //set overridable=true for styling individual
                 //nodes or edges
                 Node: {
                     height: 20,
-                    width: 60,
-                    type: 'rectangle',
-                    color: '#aaa',
+                    width: 40,
+                    //use a custom
+                    //node rendering function
+                    type: 'nodeline',
+                    color:'#23A4FF',
+                    lineWidth: 2,
+                    align:"center",
                     overridable: true
                 },
 
                 Edge: {
                     type: 'bezier',
+                    lineWidth: 2,
+                    color:'#23A4FF',
                     overridable: true
                 },
+
+                //Add a request method for requesting on-demand json trees.
+                //This method gets called when a node
+                //is clicked and its subtree has a smaller depth
+                //than the one specified by the levelsToShow parameter.
+                //In that case a subtree is requested and is added to the dataset.
+                //This method is asynchronous, so you can make an Ajax request for that
+                //subtree and then handle it to the onComplete callback.
+                //Here we just use a client-side tree generator (the getTree function).
+//                request: function(nodeId, level, onComplete) {
+//                  var ans = getTree(nodeId, level);
+//                  onComplete.onComplete(nodeId, ans);
+//                },
 
                 onBeforeCompute: function(node){
                     Log.write("loading " + node.name);
@@ -74,20 +117,18 @@
                     label.id = node.id;
                     label.innerHTML = node.name;
                     label.onclick = function(){
-                        if(normal.checked) {
-                          st.onClick(node.id);
-                        } else {
-                        st.setRoot(node.id, 'animate');
-                        }
+                        st.onClick(node.id);
                     };
                     //set label styles
                     var style = label.style;
-                    style.width = 60 + 'px';
+                    style.width = 40 + 'px';
                     style.height = 17 + 'px';
                     style.cursor = 'pointer';
-                    style.color = '#333';
+                    style.color = '#fff';
+                    //style.backgroundColor = '#1a1a1a';
                     style.fontSize = '0.8em';
                     style.textAlign= 'center';
+                    style.textDecoration = 'underline';
                     style.paddingTop = '3px';
                 },
 
@@ -104,15 +145,6 @@
                     }
                     else {
                         delete node.data.$color;
-                        //if the node belongs to the last plotted level
-                        if(!node.anySubnode("exist")) {
-                            //count children number
-                            var count = 0;
-                            node.eachSubnode(function(n) { count++; });
-                            //assign a node color based on
-                            //how many children it has
-                            node.data.$color = ['#aaa', '#baa', '#caa', '#daa', '#eaa', '#faa'][count];
-                        }
                     }
                 },
 
@@ -143,7 +175,7 @@
 
         $(document).ready(function () {
             if ("${full}" == "true") {
-                $.getJSON("../lineage", function (data) {
+                $.getJSON("./lineage", function (data) {
                     initTree(data);
                 });
             } else {

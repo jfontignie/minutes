@@ -1,8 +1,6 @@
 package minutes
 
 import grails.converters.JSON
-import grails.converters.XML
-import org.springframework.cache.annotation.Cacheable
 
 class MeetingController {
 
@@ -150,7 +148,7 @@ class MeetingController {
     }
 
     def graph() {
-        [meetingId: params.id, full: params.identity == null]
+        [meetingId: params.id, full: params.id == null]
     }
 
     def lineage() {
@@ -158,7 +156,7 @@ class MeetingController {
 
 
         if (!params.id) {
-            result = [id: -1, name: ".", children: Meeting.findAllByRootMeetingIsNull().collect { lineageNode(it) }]
+            result = [id: -1, name: ".", data: [:], children: Meeting.findAllByRootMeetingIsNull().collect { lineageNode(it) }]
 
         } else {
             def meetingInstance = Meeting.get(params.id)
@@ -167,7 +165,7 @@ class MeetingController {
                 redirect(action: "list")
                 return
             }
-            result = [lineageNode(meetingInstance)]
+            result = lineageNode(meetingInstance)
         }
 
         render result as JSON
@@ -187,7 +185,7 @@ class MeetingController {
 
         [id: node.getId(),
                 name: node.getTitle(),
-                data: [],
+                data: [:],
                 children: node.getChildren().collect { recursiveNode(it) }
         ]
     }
