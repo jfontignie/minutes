@@ -2,7 +2,6 @@ package minutes
 
 class Content {
 
-
     static searchable = true
     static belongsTo = [meeting: Meeting]
 

@@ -2,6 +2,7 @@ package minutes
 
 import grails.converters.JSON
 import grails.converters.XML
+import org.springframework.cache.annotation.Cacheable
 
 class MeetingController {
 
@@ -87,7 +88,7 @@ class MeetingController {
         }
 
 
-        m.findAll {w -> w.getKey().startsWith("user")
+        m.findAll { w -> w.getKey().startsWith("user")
         }.each {
             def user = User.findByInitials(it.getValue())
             if (!user) {
@@ -105,7 +106,7 @@ class MeetingController {
         }
         log.info("meeting has been saved: " + meeting)
 
-        m.findAll {w -> w.getKey().startsWith("subject")
+        m.findAll { w -> w.getKey().startsWith("subject")
         }.each {
             String key = it.getKey()
             String subject = it.getValue()
@@ -149,14 +150,7 @@ class MeetingController {
     }
 
     def graph() {
-
-//        def meetingInstance = Meeting.get(params.id)
-//        if (!meetingInstance) {
-//            flash.message = message(code: 'default.not.found.message', args: [message(code: 'meeting.label', default: 'Meeting'), params.id])
-//            redirect(action: "list")
-//            return
-//        }
-//        [meetingInstance: meetingInstance]
+        [meetingId: params.id, full: params.identity == null]
     }
 
     def lineage() {
@@ -164,7 +158,7 @@ class MeetingController {
 
 
         if (!params.id) {
-            result = [id: -1, name: ".", children: Meeting.findAllByRootMeetingIsNull().collect {lineageNode(it)}]
+            result = [id: -1, name: ".", children: Meeting.findAllByRootMeetingIsNull().collect { lineageNode(it) }]
 
         } else {
             def meetingInstance = Meeting.get(params.id)
@@ -190,9 +184,11 @@ class MeetingController {
     }
 
     private def recursiveNode(Meeting node) {
+
         [id: node.getId(),
-         name: node.getTitle(),
-                children: node.getChildren().collect {recursiveNode(it)}
+                name: node.getTitle(),
+                data: [],
+                children: node.getChildren().collect { recursiveNode(it) }
         ]
     }
 }

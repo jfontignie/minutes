@@ -8,7 +8,7 @@ class Meeting {
     static searchable = true
     //static belongsTo = [session: Session]
     static hasMany = [users: User, contents: Content, children: Meeting]
-    static mappedBy = [children: 'previousMeeting']
+    static mappedBy = [children: 'previousMeeting' ]
 
 
     Meeting previousMeeting
