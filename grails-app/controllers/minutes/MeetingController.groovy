@@ -1,6 +1,7 @@
 package minutes
 
 import grails.converters.JSON
+import grails.converters.XML
 
 class MeetingController {
 
@@ -113,12 +114,13 @@ class MeetingController {
             String text = m["content${substring}"]
             def content = Content.findByTitleAndMeeting(subject, meeting) ?: new Content()
 
+            def toDelete = !(subject || text)
             content.setTitle(subject ?: "<empty>")
             content.setText(text ?: "<empty>")
             content.setMeeting(meeting)
             if (!content.save())
                 log.error(content.errors)
-            if (!content.getText() && !content.getTitle())
+            if (toDelete)
                 content.delete()
         }
 
@@ -159,6 +161,8 @@ class MeetingController {
 
     def lineage() {
         def result
+
+
         if (!params.id) {
             result = [id: -1, name: ".", children: Meeting.findAllByRootMeetingIsNull().collect {lineageNode(it)}]
 

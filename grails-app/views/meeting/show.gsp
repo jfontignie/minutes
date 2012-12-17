@@ -65,7 +65,7 @@
                     <tbody>
                     <g:each in="${meetingInstance.contents}" var="c">
                         <tr>
-                         <td class="property-value" aria-labelledby="contents-label"><g:link controller="content"
+                         <td class="property-value" aria-labelledby="contents-label"><g:link controller="crudContent"
                                                                                              action="show"
                                                                                              id="${c.id}">${c.title?.encodeAsHTML()}</g:link></td>
                         <td class="content">

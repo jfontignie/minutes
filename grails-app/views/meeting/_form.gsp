@@ -88,6 +88,7 @@
 
     $(function(){
         $("#dialog" ).dialog({ autoOpen: false });
+        $("#history" ).dialog({ autoOpen: false });
     });
 
 </r:script>
@@ -108,7 +109,9 @@
 <g:if test="${meetingInstance.previousMeeting}">
     <div id="dialog" title="Previous meeting">
         <g:render template="previous"/>
-
+    </div>
+    <div id="history" title="Subject history">
+        <iframe id="iframeHistory"></iframe>
     </div>
 </g:if>
 
