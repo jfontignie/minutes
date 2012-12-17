@@ -23,7 +23,7 @@
         <tr>
             <td>${contentInstance.title}</td>
             <td>${contentInstance.text}</td>
-            <td>${contentInstance.meeting.dateEvent}</td>
+            <td><g:formatDate date="${contentInstance.meeting.dateEvent}"/></td>
         </tr>
     </g:each>
     </tbody>

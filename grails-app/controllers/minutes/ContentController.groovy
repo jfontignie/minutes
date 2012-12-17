@@ -21,6 +21,7 @@ class ContentController {
                 order("dateEvent", "desc")
 
             }
+            eq("title",contentInstance.getTitle())
         }
 
         [contentInstances: list]
